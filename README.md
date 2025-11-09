@@ -5,7 +5,7 @@ A magical website to dive in chemistry
 Prerequisties
 - Node.js (version >= 16)
 
-Install dependencies
+Install dependencies <br>
 Make sure the current directory contains `package.json` file.
 ```bash
 npm install
