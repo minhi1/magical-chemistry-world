@@ -4,3 +4,4 @@ dist/
 build/
 .vscode/
 package-lock.json
+test/
