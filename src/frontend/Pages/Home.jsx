@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import menuBackground from "../assets/menu-background.png";
 import classDropdownButton from "../assets/class-dropdown-button.png";
@@ -13,12 +13,18 @@ import iconMail from "../assets/icon-mail.png";
 import iconSettings from "../assets/icon-settings.png";
 import iconUser from "../assets/icon-user.png";
 import magicalChemWorldTitle from "../assets/magical-chem-world-title.png";
+import openLetterIcon from "../assets/open-letter.png";
+import OpenLetterModal from "../Components/OpenLetterModal";
+import checkButton from "../assets/check-button.png";
 
 const Home = () => {
   const navigate = useNavigate();
   const [selectedClass, setSelectedClass] = useState(7);
   const [selectedLesson, setSelectedLesson] = useState(2);
   const [showLessons, setShowLessons] = useState(false);
+  const [isLetterOpen, setIsLetterOpen] = useState(false);
+
+  // useEffect(() => {}), [isLetterOpen];
 
   const handleClassSelect = (classNumber) => {
     setSelectedClass(classNumber);
@@ -36,6 +42,9 @@ const Home = () => {
 
   const handleIconClick = (iconType) => {
     console.log(`${iconType} clicked - functionality to be implemented`);
+    if (iconType === 'mail') {
+      setIsLetterOpen(true);
+    }
   };
 
   const handleFriendsClick = () => {
@@ -59,18 +68,23 @@ const Home = () => {
       >
         {/* Top Right Icons - Vertical Stack */}
         <div className="absolute top-4 right-4 flex flex-col space-y-2">
+          {/* Settings */}
           <button 
             onClick={() => handleIconClick('settings')}
             className="hover:scale-110 transition-transform"
           >
             <img src={iconSettings} alt="Settings" />
           </button>
+
+          {/* Mail */}
           <button 
             onClick={() => handleIconClick('mail')}
             className="hover:scale-110 transition-transform"
           >
             <img src={iconMail} alt="Mail" />
           </button>
+
+          {/* User */}
           <button 
             onClick={() => handleIconClick('user')}
             className="hover:scale-110 transition-transform"
@@ -241,6 +255,22 @@ const Home = () => {
             </button>
           </div>
         </div>
+        
+        {/* Open Letter */}
+        {isLetterOpen && (
+          <OpenLetterModal isOpen={isLetterOpen} onClose={() => setIsLetterOpen(false)}>
+            <div className="relative inline-block">
+              <img src={openLetterIcon} alt="Open Letter" />
+              <img 
+                src={checkButton} 
+                alt="Close Modal" 
+                className="absolute top-9 right-6 w-9 h-9 cursor-pointer"
+                onClick={() => setIsLetterOpen(false)}
+              />
+            </div>
+          </OpenLetterModal>
+        )}
+
       </div>
     </div>
   );
