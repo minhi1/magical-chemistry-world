@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useGame } from "../../context/GameContext";
 import { GameSquare, SQUARE_SIZE } from "../../Components/GameSquare";
-import PlayerPanel from "../../Components/PlayerPanel";
 import DiceRoller from "../../Components/DiceRoller";
 import QuestionModal from "../../Components/QuestionModal";
 import DarkArtsModal from "../../Components/DarkArtsModal";
@@ -18,7 +17,6 @@ import locomotorMortisImg from "../../assets/locomotor-mortis.png";
 import owlImg from "../../assets/owl.png";
 import newtImg from "../../assets/newt.png";
 import wombatImg from "../../assets/wombat.png";
-import diceRollImg from "../../assets/dice-roll.png";
 import titleImg from "../../assets/title.png";
 
 import {
@@ -101,16 +99,13 @@ const ChemistryGame = () => {
   // Get square ID from position number
   const getSquareIdFromPosition = (position) => {
     // Bottom row (right to left): positions 1-8
-    // Position 1 is bottom-right (start), position 8 is bottom-left (corner)
     if (position >= 1 && position <= 8) {
       return `bottom-${8 - position}`;
     }
-    // Left column (bottom to top): positions 9-10
-    // Position 9 is lower-left, position 10 is upper-left
-    if (position === 9) return "left-3"; // Lower left square (row 3)
-    if (position === 10) return "left-2"; // Upper left square (row 2)
+    // Left column: positions 9-10
+    if (position === 9) return "left-3";
+    if (position === 10) return "left-2";
     // Top row (left to right): positions 11-18
-    // Position 11 is top-left (corner), position 18 is top-right (corner)
     if (position >= 11 && position <= 18) {
       return `top-${position - 11}`;
     }
@@ -175,7 +170,6 @@ const ChemistryGame = () => {
 
     dispatch({ type: "ROLL_DICE", payload: value });
 
-    // Calculate new position
     setTimeout(() => {
       movePlayer(value);
     }, 500);
@@ -186,19 +180,11 @@ const ChemistryGame = () => {
     setAnimatingMove(true);
     let newPosition = state.currentPosition + steps;
 
-    // Don't go past the end
-    if (newPosition > 19) {
-      newPosition = 19;
-    }
-
-    // Don't go below start
-    if (newPosition < 1) {
-      newPosition = 1;
-    }
+    if (newPosition > 19) newPosition = 19;
+    if (newPosition < 1) newPosition = 1;
 
     dispatch({ type: "MOVE_TO_POSITION", payload: newPosition });
 
-    // After moving, handle the square effect
     setTimeout(() => {
       setAnimatingMove(false);
       handleSquareEffect(newPosition, isFromForcedMove);
@@ -209,13 +195,11 @@ const ChemistryGame = () => {
   const handleSquareEffect = (position, isFromForcedMove = false) => {
     const squareConfig = SQUARE_CONFIG[position];
 
-    // Check if it's a question square
     if (
       [SQUARE_TYPES.OWL, SQUARE_TYPES.NEWT, SQUARE_TYPES.WOMBAT].includes(
         squareConfig.type
       )
     ) {
-      // Load question for this square and lesson
       const question = getQuestionByLessonAndSquare(
         state.selectedLesson,
         position
@@ -223,27 +207,16 @@ const ChemistryGame = () => {
 
       if (question) {
         dispatch({ type: "SET_CURRENT_QUESTION", payload: question });
-        dispatch({
-          type: "HANDLE_SQUARE_EFFECT",
-          payload: { position },
-        });
+        dispatch({ type: "HANDLE_SQUARE_EFFECT", payload: { position } });
       } else {
-        // No question found, just continue
         dispatch({
           type: "SET_MESSAGE",
           payload: "Không có câu hỏi cho ô này.",
         });
-        dispatch({
-          type: "HANDLE_SQUARE_EFFECT",
-          payload: { position },
-        });
+        dispatch({ type: "HANDLE_SQUARE_EFFECT", payload: { position } });
       }
     } else if (squareConfig.type === SQUARE_TYPES.ACCIO && !isFromForcedMove) {
-      // Move forward 1 (only if not already from a forced move)
-      dispatch({
-        type: "HANDLE_SQUARE_EFFECT",
-        payload: { position },
-      });
+      dispatch({ type: "HANDLE_SQUARE_EFFECT", payload: { position } });
       setTimeout(() => {
         const newPos = Math.min(19, position + 1);
         dispatch({ type: "MOVE_TO_POSITION", payload: newPos });
@@ -255,11 +228,7 @@ const ChemistryGame = () => {
       squareConfig.type === SQUARE_TYPES.DEPULSO &&
       !isFromForcedMove
     ) {
-      // Move backward 1 (only if not already from a forced move)
-      dispatch({
-        type: "HANDLE_SQUARE_EFFECT",
-        payload: { position },
-      });
+      dispatch({ type: "HANDLE_SQUARE_EFFECT", payload: { position } });
       setTimeout(() => {
         const newPos = Math.max(1, position - 1);
         dispatch({ type: "MOVE_TO_POSITION", payload: newPos });
@@ -268,17 +237,9 @@ const ChemistryGame = () => {
         }, 800);
       }, 1000);
     } else if (squareConfig.type === SQUARE_TYPES.LOCOMOTOR) {
-      // Skip turn
-      dispatch({
-        type: "HANDLE_SQUARE_EFFECT",
-        payload: { position },
-      });
+      dispatch({ type: "HANDLE_SQUARE_EFFECT", payload: { position } });
     } else {
-      // Regular square or start/destination (including ACCIO/DEPULSO when from forced move)
-      dispatch({
-        type: "HANDLE_SQUARE_EFFECT",
-        payload: { position },
-      });
+      dispatch({ type: "HANDLE_SQUARE_EFFECT", payload: { position } });
     }
   };
 
@@ -289,15 +250,13 @@ const ChemistryGame = () => {
       payload: { isCorrect, difficulty },
     });
 
-    // Trigger Dark Arts card when answer is wrong
     if (!isCorrect) {
-      // Randomly select 1 out of 3 Dark Arts cards
       const randomIndex = Math.floor(Math.random() * 3);
       const selectedCard = DARK_ARTS_CARDS[randomIndex];
 
       setTimeout(() => {
         dispatch({ type: "TRIGGER_DARK_ARTS", payload: selectedCard });
-      }, 500); // Show right after question modal closes
+      }, 500);
     }
   };
 
@@ -306,18 +265,13 @@ const ChemistryGame = () => {
     const darkArts = state.currentDarkArts;
     dispatch({ type: "APPLY_DARK_ARTS" });
 
-    // After Dark Arts is applied, check if position changed and trigger square effect
     setTimeout(() => {
       const effect = darkArts.effect;
       if (effect === "MOVE_BACK_2" || effect === "RESET_TO_START") {
-        // Get the new position after Dark Arts effect
         let newPos = state.currentPosition;
-        if (effect === "MOVE_BACK_2") {
-          newPos = Math.max(1, state.currentPosition - 2);
-        } else if (effect === "RESET_TO_START") {
-          newPos = 1;
-        }
-        // Trigger the square effect at the new position
+        if (effect === "MOVE_BACK_2") newPos = Math.max(1, newPos - 2);
+        else if (effect === "RESET_TO_START") newPos = 1;
+
         handleSquareEffect(newPos, false);
       }
     }, 100);
@@ -338,7 +292,6 @@ const ChemistryGame = () => {
     backgroundSize: "cover",
     backgroundPosition: "center",
     margin: "0 auto",
-    // ensure squares are inside the visible background area
     boxSizing: "content-box",
   };
 
@@ -349,7 +302,7 @@ const ChemistryGame = () => {
     left: 0,
     width: BOARD_WIDTH,
     height: BOARD_HEIGHT,
-    pointerEvents: "none", // allow clicks only on squares (they will enable pointer events)
+    pointerEvents: "none",
   };
 
   // Dice roll style
@@ -393,38 +346,45 @@ const ChemistryGame = () => {
     };
 
   return (
-    <div className="min-h-screen bg-gray-900 relative flex flex-col items-center py-10">
-      {/* Top Header */}
-      <div className="w-[1100px] flex justify-between items-center mb-6 px-4">
-        <div
-          className="bg-purple-800 text-white rounded-full px-10 py-4 font-bold text-2xl shadow-md"
-          style={{ fontFamily: "Alfa Slab One, serif" }}
-        >
-          LỚP {location.state?.class || 7} - {lessonObj.name.toUpperCase()}
-        </div>
-        <div className="flex items-center gap-4">
-          <div
-            className="bg-yellow-300 rounded-full px-14 py-4 font-bold text-2xl shadow-md flex items-center"
-            style={{ fontFamily: "Alfa Slab One, serif" }}
-          >
-            <span className="mr-2">SỐ ĐIỂM:</span> <span>{state.tokens}</span>
-          </div>
-          <button
-            onClick={() => navigate("/")}
-            className="text-4xl hover:scale-110 transition-transform"
-            title="Cài đặt"
-          >
-            ⚙️
-          </button>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center py-10">
       {/* Board Container */}
       <div
         className="relative"
         style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
       >
         <div style={boardStyle} className="rounded-xl overflow-hidden shadow-2xl">
+          {/* ===== Góc trên trái: LỚP / BÀI ===== */}
+          <div
+            className="absolute top-4 left-4 px-8 py-3 rounded-full text-white text-xl font-bold shadow-md"
+            style={{
+              backgroundColor: "#5b21b6", // tương đương bg-purple-800
+              fontFamily: "Alfa Slab One, serif",
+            }}
+          >
+            LỚP {location.state?.class || 7} - {lessonObj.name.toUpperCase()}
+          </div>
+
+          {/* ===== Góc trên phải: ĐIỂM + nút cài đặt ===== */}
+          <div className="absolute top-4 right-4 flex items-center gap-4">
+            <div
+              className="rounded-full px-10 py-3 text-xl font-bold shadow-md flex items-center"
+              style={{
+                backgroundColor: "#fde047", // bg-yellow-300
+                fontFamily: "Alfa Slab One, serif",
+              }}
+            >
+              <span className="mr-2">SỐ ĐIỂM:</span>
+              <span>{state.tokens}</span>
+            </div>
+            <button
+              onClick={() => navigate("/")}
+              className="text-3xl hover:scale-110 transition-transform"
+              title="Cài đặt"
+            >
+              ⚙️
+            </button>
+          </div>
+
           {/* Squares + player */}
           <div style={wrapperStyle}>
             {squares.map((sq) => (
