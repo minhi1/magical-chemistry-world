@@ -1,74 +1,170 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import titleImg from "../assets/title.png";
+import menuBackground from "../assets/menu-background.png";
+import classDropdownButton from "../assets/class-dropdown-button.png";
+import classButton from "../assets/class-button.png";
+import buttonImg from "../assets/button.png";
+import witchHello from "../assets/witch-hello.png";
+import startButton from "../assets/start-button.png";
+import fence from "../assets/fence.png";
+import friendsTextButton from "../assets/friends-text-button.png";
+import progressTextButton from "../assets/progress-text-button.png";
+import iconMail from "../assets/icon-mail.png";
+import iconSettings from "../assets/icon-settings.png";
+import iconUser from "../assets/icon-user.png";
+import magicalChemWorldTitle from "../assets/magical-chem-world-title.png";
 
 const Home = () => {
+  const [selectedClass, setSelectedClass] = useState(7);
+
+  const handleClassSelect = (classNumber) => {
+    setSelectedClass(classNumber);
+  };
+
+  const handleIconClick = (iconType) => {
+    console.log(`${iconType} clicked - functionality to be implemented`);
+  };
+
+  const handleFriendsClick = () => {
+    console.log("Friends clicked - functionality to be implemented");
+  };
+
+  const handleProgressClick = () => {
+    console.log("Progress clicked - functionality to be implemented");
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center">
-      <div className="max-w-4xl mx-auto text-center px-6 py-12">
-        {/* Main Title */}
-        <div className="mb-8">
-          <img 
-            src={titleImg} 
-            alt="Magical Chemistry World" 
-            className="mx-auto mb-6 max-w-2xl w-full h-auto"
-          />
-          <p className="text-xl md:text-2xl text-gray-300 mb-8">
-            Hành trình khám phá hóa học kỳ diệu
-          </p>
+    <div className="min-h-screen bg-purple-900 flex items-center justify-center">
+      {/* Main Game Container - Fixed Size like board-game-illustration */}
+      <div 
+        className="relative bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${menuBackground})`,
+          width: '912px', // Same as board game width (COLS * SQUARE_SIZE = 8 * 114)
+          height: '684px', // Same as board game height (ROWS * SQUARE_SIZE = 6 * 114)
+        }}
+      >
+        {/* Top Right Icons - Vertical Stack */}
+        <div className="absolute top-4 right-4 flex flex-col space-y-2">
+          <button 
+            onClick={() => handleIconClick('settings')}
+            className="hover:scale-110 transition-transform"
+          >
+            <img src={iconSettings} alt="Settings" />
+          </button>
+          <button 
+            onClick={() => handleIconClick('mail')}
+            className="hover:scale-110 transition-transform"
+          >
+            <img src={iconMail} alt="Mail" />
+          </button>
+          <button 
+            onClick={() => handleIconClick('user')}
+            className="hover:scale-110 transition-transform"
+          >
+            <img src={iconUser} alt="User" />
+          </button>
         </div>
 
-        {/* Description */}
-        <div className="bg-gray-900 bg-opacity-70 rounded-2xl p-8 mb-8 border-2 border-yellow-500">
-          <h2 className="text-3xl font-bold text-yellow-400 mb-4">
-            🧙‍♂️ Chào mừng đến với thế giới hóa học ma thuật!
-          </h2>
-          <p className="text-lg text-gray-300 mb-6">
-            Khám phá những bí mật của hóa học thông qua một cuộc phiêu lưu đầy thú vị 
-            trong thế giới Harry Potter. Trả lời câu hỏi, thu thập token và trở thành 
-            nhà phù thủy hóa học giỏi nhất!
-          </p>
-          
-          {/* Features */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="text-left">
-              <h3 className="text-yellow-300 font-semibold mb-2">🎯 Tính năng nổi bật:</h3>
-              <ul className="text-gray-300 space-y-1">
-                <li>📚 6 bài học hóa học lớp 7</li>
-                <li>🎲 Trò chơi board game tương tác</li>
-                <li>🏆 Hệ thống điểm thưởng token</li>
-                <li>🎭 Chủ đề Harry Potter hấp dẫn</li>
-              </ul>
-            </div>
-            <div className="text-left">
-              <h3 className="text-yellow-300 font-semibold mb-2">📖 Nội dung học:</h3>
-              <ul className="text-gray-300 space-y-1">
-                <li>⚛️ Nguyên tử và cấu tạo</li>
-                <li>🧪 Nguyên tố hóa học</li>
-                <li>📊 Bảng tuần hoàn</li>
-                <li>🔗 Liên kết hóa học</li>
-              </ul>
-            </div>
+        {/* Main Title */}
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
+          <img 
+            src={magicalChemWorldTitle} 
+            alt="Magical Chemistry World"
+          />
+        </div>
+
+        {/* Left Side - Class Selection */}
+        <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
+          {/* Class Dropdown Header */}
+          <div className="mb-4">
+            <img 
+              src={classDropdownButton} 
+              alt="Khối"
+            />
+          </div>
+
+          {/* Class Buttons */}
+          <div className="space-y-3">
+            {[7, 8, 9].map((classNum) => (
+              <button
+                key={classNum}
+                onClick={() => handleClassSelect(classNum)}
+                className="relative block hover:scale-105 transition-transform"
+              >
+                <img 
+                  src={buttonImg} 
+                  alt={`Lớp ${classNum}`}
+                />
+                {/* Class Number Text */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-black font-bold text-lg">
+                    Lớp {classNum}
+                  </span>
+                </div>
+                {/* Selection Circle */}
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  <div 
+                    className={`w-6 h-6 rounded-full border-2 border-black ${
+                      selectedClass === classNum ? 'bg-red-500' : 'bg-yellow-400'
+                    }`}
+                  />
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Call to Action */}
-        <div className="space-y-4">
-          <Link
-            to="/game/chemistry"
-            className="inline-block bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 font-bold py-4 px-8 rounded-xl text-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            🚀 Bắt đầu trò chơi
-          </Link>
-          
-          <p className="text-gray-400 text-sm">
-            Không cần đăng ký - Chơi ngay lập tức!
-          </p>
+        {/* Center - Witch Character */}
+        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <img 
+            src={witchHello} 
+            alt="Witch Character"
+            className="w-48 h-auto"
+          />
         </div>
 
-        {/* Footer */}
-        <div className="mt-12 text-center text-gray-500 text-sm">
-          <p>© 2025 Magical Chemistry World - Học hóa học một cách thú vị</p>
+        {/* Bottom Center - Start Button */}
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+          <Link to="/game" className="block hover:scale-105 transition-transform">
+            <img 
+              src={startButton} 
+              alt="Start Game"
+            />
+          </Link>
+        </div>
+
+        {/* Bottom Right - Single Fence with Both Buttons */}
+        <div className="absolute bottom-0 right-0">
+          {/* Static Fence Background */}
+          <div className="relative">
+            <img 
+              src={fence} 
+              alt="Menu Fence"
+            />
+            
+            {/* Friends Button (Top Row) */}
+            <button 
+              onClick={handleFriendsClick}
+              className="absolute top-3 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform"
+            >
+              <img 
+                src={friendsTextButton} 
+                alt="Bạn bè"
+              />
+            </button>
+
+            {/* Progress Button (Bottom Row) */}
+            <button 
+              onClick={handleProgressClick}
+              className="absolute bottom-3 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform"
+            >
+              <img 
+                src={progressTextButton} 
+                alt="Tiến độ"
+              />
+            </button>
+          </div>
         </div>
       </div>
     </div>

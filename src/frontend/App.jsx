@@ -9,7 +9,7 @@ export default function App() {
     <GameProvider>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/game/chemistry" element={<ChemistryGame />} />
+        <Route path="/game" element={<ChemistryGame />} />
       </Routes>
     </GameProvider>
   );
