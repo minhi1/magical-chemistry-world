@@ -21,19 +21,29 @@ import wombatImg from "../../assets/wombat.png";
 import diceRollImg from "../../assets/dice-roll.png";
 import titleImg from "../../assets/title.png";
 
-import { COLS, ROWS, BOARD_WIDTH, BOARD_HEIGHT, GAME_PHASES, SQUARE_CONFIG, SQUARE_TYPES, DARK_ARTS_CARDS, LESSONS } from "../../data/gameConfig";
+import {
+  COLS,
+  ROWS,
+  BOARD_WIDTH,
+  BOARD_HEIGHT,
+  GAME_PHASES,
+  SQUARE_CONFIG,
+  SQUARE_TYPES,
+  DARK_ARTS_CARDS,
+  LESSONS,
+} from "../../data/gameConfig";
 import { getQuestionByLessonAndSquare } from "../../data/questions";
 
 // Store the source and positions for each type of image
 const imgInfo = {
-  accio: { src: accioImg, positions: [10,15] },
+  accio: { src: accioImg, positions: [10, 15] },
   albusDumbledore: { src: albusDumbledoreImg, positions: [19] },
   argusFilch: { src: argusFilchImg, positions: [1] },
-  depulso: { src: depulsoImg, positions: [8,17] },
+  depulso: { src: depulsoImg, positions: [8, 17] },
   locomotorMortis: { src: locomotorMortisImg, positions: [12] },
-  owl: { src: owlImg, positions: [2,3,5,7] },
-  newtImg: { src: newtImg, positions: [4,6,11,16] },
-  wombatImg: { src: wombatImg, positions: [9,13,14,18] },
+  owl: { src: owlImg, positions: [2, 3, 5, 7] },
+  newtImg: { src: newtImg, positions: [4, 6, 11, 16] },
+  wombatImg: { src: wombatImg, positions: [9, 13, 14, 18] },
 };
 
 const ChemistryGame = () => {
@@ -44,22 +54,23 @@ const ChemistryGame = () => {
 
   // Get lesson and mode from navigation state
   const lesson = location.state?.lesson || 2;
-  const mode = location.state?.mode || 'single';
+  const mode = location.state?.mode || "single";
 
   // Auto-start game when component mounts
   useEffect(() => {
     if (state.gamePhase === GAME_PHASES.SETUP) {
       dispatch({
-        type: 'START_GAME',
-        payload: { lesson, mode }
+        type: "START_GAME",
+        payload: { lesson, mode },
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Prepare images by position array for quick lookup
   const imgsByPosition = [];
-  for (var i = 0; i < COLS * 2 + 3; ++i) {
-    imgsByPosition.push(placeholderSquare);  
+  for (let i = 0; i < COLS * 2 + 3; ++i) {
+    imgsByPosition.push(placeholderSquare);
   }
 
   for (const key in imgInfo) {
@@ -73,13 +84,13 @@ const ChemistryGame = () => {
   const getPositionById = (id) => {
     const [side, index] = id.split("-");
     if (side === "top") {
-      var c = parseInt(index, 10);
+      const c = parseInt(index, 10);
       return COLS + 2 + c;
     } else if (side === "bottom") {
-      var c = parseInt(index, 10);
+      const c = parseInt(index, 10);
       return COLS - c - 1;
     } else if (side === "left") {
-      var r = parseInt(index, 10);
+      const r = parseInt(index, 10);
       return COLS + (r - 1);
     } else if (side === "right") {
       return COLS * 2 + 2;
@@ -96,7 +107,7 @@ const ChemistryGame = () => {
     }
     // Left column (bottom to top): positions 9-10
     // Position 9 is lower-left, position 10 is upper-left
-    if (position === 9) return "left-3";  // Lower left square (row 3)
+    if (position === 9) return "left-3"; // Lower left square (row 3)
     if (position === 10) return "left-2"; // Upper left square (row 2)
     // Top row (left to right): positions 11-18
     // Position 11 is top-left (corner), position 18 is top-right (corner)
@@ -142,8 +153,8 @@ const ChemistryGame = () => {
     });
   }
 
-  // right side: single square in right column between top and bottom (choose row 2 here)
-  const rightRow = 2; // you can change to 1 if you prefer it higher
+  // right side: single square in right column between top and bottom (row 2)
+  const rightRow = 2;
   squares.push({
     id: `right-${rightRow}`,
     left: (COLS - 1) * SQUARE_SIZE,
@@ -154,13 +165,16 @@ const ChemistryGame = () => {
   // Handle dice roll
   const handleDiceRoll = (value) => {
     if (state.turnsToSkip > 0) {
-      dispatch({ type: 'SET_MESSAGE', payload: `🚫 Bạn bị mất lượt! Còn ${state.turnsToSkip - 1} lượt nữa.` });
-      dispatch({ type: 'SKIP_QUESTION' });
+      dispatch({
+        type: "SET_MESSAGE",
+        payload: `🚫 Bạn bị mất lượt! Còn ${state.turnsToSkip - 1} lượt nữa.`,
+      });
+      dispatch({ type: "SKIP_QUESTION" });
       return;
     }
 
-    dispatch({ type: 'ROLL_DICE', payload: value });
-    
+    dispatch({ type: "ROLL_DICE", payload: value });
+
     // Calculate new position
     setTimeout(() => {
       movePlayer(value);
@@ -171,18 +185,18 @@ const ChemistryGame = () => {
   const movePlayer = (steps, isFromForcedMove = false) => {
     setAnimatingMove(true);
     let newPosition = state.currentPosition + steps;
-    
+
     // Don't go past the end
     if (newPosition > 19) {
       newPosition = 19;
     }
-    
+
     // Don't go below start
     if (newPosition < 1) {
       newPosition = 1;
     }
 
-    dispatch({ type: 'MOVE_TO_POSITION', payload: newPosition });
+    dispatch({ type: "MOVE_TO_POSITION", payload: newPosition });
 
     // After moving, handle the square effect
     setTimeout(() => {
@@ -194,54 +208,85 @@ const ChemistryGame = () => {
   // Handle square effects
   const handleSquareEffect = (position, isFromForcedMove = false) => {
     const squareConfig = SQUARE_CONFIG[position];
-    
+
     // Check if it's a question square
-    if ([SQUARE_TYPES.OWL, SQUARE_TYPES.NEWT, SQUARE_TYPES.WOMBAT].includes(squareConfig.type)) {
+    if (
+      [SQUARE_TYPES.OWL, SQUARE_TYPES.NEWT, SQUARE_TYPES.WOMBAT].includes(
+        squareConfig.type
+      )
+    ) {
       // Load question for this square and lesson
-      const question = getQuestionByLessonAndSquare(state.selectedLesson, position);
-      
+      const question = getQuestionByLessonAndSquare(
+        state.selectedLesson,
+        position
+      );
+
       if (question) {
-        dispatch({ type: 'SET_CURRENT_QUESTION', payload: question });
-        dispatch({ type: 'HANDLE_SQUARE_EFFECT', payload: { position } });
+        dispatch({ type: "SET_CURRENT_QUESTION", payload: question });
+        dispatch({
+          type: "HANDLE_SQUARE_EFFECT",
+          payload: { position },
+        });
       } else {
         // No question found, just continue
-        dispatch({ type: 'SET_MESSAGE', payload: 'Không có câu hỏi cho ô này.' });
-        dispatch({ type: 'HANDLE_SQUARE_EFFECT', payload: { position } });
+        dispatch({
+          type: "SET_MESSAGE",
+          payload: "Không có câu hỏi cho ô này.",
+        });
+        dispatch({
+          type: "HANDLE_SQUARE_EFFECT",
+          payload: { position },
+        });
       }
     } else if (squareConfig.type === SQUARE_TYPES.ACCIO && !isFromForcedMove) {
       // Move forward 1 (only if not already from a forced move)
-      dispatch({ type: 'HANDLE_SQUARE_EFFECT', payload: { position } });
+      dispatch({
+        type: "HANDLE_SQUARE_EFFECT",
+        payload: { position },
+      });
       setTimeout(() => {
         const newPos = Math.min(19, position + 1);
-        dispatch({ type: 'MOVE_TO_POSITION', payload: newPos });
+        dispatch({ type: "MOVE_TO_POSITION", payload: newPos });
         setTimeout(() => {
           handleSquareEffect(newPos, true);
         }, 800);
       }, 1000);
-    } else if (squareConfig.type === SQUARE_TYPES.DEPULSO && !isFromForcedMove) {
+    } else if (
+      squareConfig.type === SQUARE_TYPES.DEPULSO &&
+      !isFromForcedMove
+    ) {
       // Move backward 1 (only if not already from a forced move)
-      dispatch({ type: 'HANDLE_SQUARE_EFFECT', payload: { position } });
+      dispatch({
+        type: "HANDLE_SQUARE_EFFECT",
+        payload: { position },
+      });
       setTimeout(() => {
         const newPos = Math.max(1, position - 1);
-        dispatch({ type: 'MOVE_TO_POSITION', payload: newPos });
+        dispatch({ type: "MOVE_TO_POSITION", payload: newPos });
         setTimeout(() => {
           handleSquareEffect(newPos, true);
         }, 800);
       }, 1000);
     } else if (squareConfig.type === SQUARE_TYPES.LOCOMOTOR) {
       // Skip turn
-      dispatch({ type: 'HANDLE_SQUARE_EFFECT', payload: { position } });
+      dispatch({
+        type: "HANDLE_SQUARE_EFFECT",
+        payload: { position },
+      });
     } else {
       // Regular square or start/destination (including ACCIO/DEPULSO when from forced move)
-      dispatch({ type: 'HANDLE_SQUARE_EFFECT', payload: { position } });
+      dispatch({
+        type: "HANDLE_SQUARE_EFFECT",
+        payload: { position },
+      });
     }
   };
 
   // Handle question answer
   const handleAnswerQuestion = (isCorrect, difficulty) => {
     dispatch({
-      type: 'ANSWER_QUESTION',
-      payload: { isCorrect, difficulty }
+      type: "ANSWER_QUESTION",
+      payload: { isCorrect, difficulty },
     });
 
     // Trigger Dark Arts card when answer is wrong
@@ -249,9 +294,9 @@ const ChemistryGame = () => {
       // Randomly select 1 out of 3 Dark Arts cards
       const randomIndex = Math.floor(Math.random() * 3);
       const selectedCard = DARK_ARTS_CARDS[randomIndex];
-      
+
       setTimeout(() => {
-        dispatch({ type: 'TRIGGER_DARK_ARTS', payload: selectedCard });
+        dispatch({ type: "TRIGGER_DARK_ARTS", payload: selectedCard });
       }, 500); // Show right after question modal closes
     }
   };
@@ -259,17 +304,17 @@ const ChemistryGame = () => {
   // Handle Dark Arts penalty
   const handleApplyDarkArts = () => {
     const darkArts = state.currentDarkArts;
-    dispatch({ type: 'APPLY_DARK_ARTS' });
-    
+    dispatch({ type: "APPLY_DARK_ARTS" });
+
     // After Dark Arts is applied, check if position changed and trigger square effect
     setTimeout(() => {
       const effect = darkArts.effect;
-      if (effect === 'MOVE_BACK_2' || effect === 'RESET_TO_START') {
+      if (effect === "MOVE_BACK_2" || effect === "RESET_TO_START") {
         // Get the new position after Dark Arts effect
         let newPos = state.currentPosition;
-        if (effect === 'MOVE_BACK_2') {
+        if (effect === "MOVE_BACK_2") {
           newPos = Math.max(1, state.currentPosition - 2);
-        } else if (effect === 'RESET_TO_START') {
+        } else if (effect === "RESET_TO_START") {
           newPos = 1;
         }
         // Trigger the square effect at the new position
@@ -280,8 +325,8 @@ const ChemistryGame = () => {
 
   // Handle game restart
   const handleRestart = () => {
-    dispatch({ type: 'RESET_GAME' });
-    navigate('/');
+    dispatch({ type: "RESET_GAME" });
+    navigate("/");
   };
 
   // Board style
@@ -310,24 +355,24 @@ const ChemistryGame = () => {
   // Dice roll style
   const diceRollStyle = {
     position: "absolute",
-    left: (COLS / 2) * SQUARE_SIZE - (SQUARE_SIZE / 2),
-    top: SQUARE_SIZE * 3 - SQUARE_SIZE / 4
+    left: (COLS / 2) * SQUARE_SIZE - SQUARE_SIZE / 2,
+    top: SQUARE_SIZE * 3 - SQUARE_SIZE / 4,
   };
 
   // Title style
   const titleStyle = {
     position: "absolute",
     left: (COLS / 4) * SQUARE_SIZE + SQUARE_SIZE / 2,
-    top: SQUARE_SIZE * 2 - SQUARE_SIZE / 4
+    top: SQUARE_SIZE * 2 - SQUARE_SIZE / 4,
   };
 
   // Player piece style
   const getPlayerPieceStyle = () => {
     const squareId = getSquareIdFromPosition(state.currentPosition);
-    if (!squareId) return { display: 'none' };
+    if (!squareId) return { display: "none" };
 
-    const square = squares.find(sq => sq.id === squareId);
-    if (!square) return { display: 'none' };
+    const square = squares.find((sq) => sq.id === squareId);
+    if (!square) return { display: "none" };
 
     return {
       position: "absolute",
@@ -335,35 +380,52 @@ const ChemistryGame = () => {
       top: square.top + SQUARE_SIZE / 2 - 20,
       width: 40,
       height: 40,
-      transition: animatingMove ? 'all 0.8s ease-in-out' : 'none',
+      transition: animatingMove ? "all 0.8s ease-in-out" : "none",
       zIndex: 10,
-      pointerEvents: 'none'
+      pointerEvents: "none",
     };
   };
 
   // Get lesson display name
-  const lessonObj = LESSONS.find(l => l.id === state.selectedLesson) || { name: `Bài ${state.selectedLesson}` };
+  const lessonObj =
+    LESSONS.find((l) => l.id === state.selectedLesson) || {
+      name: `Bài ${state.selectedLesson}`,
+    };
 
   return (
     <div className="min-h-screen bg-gray-900 relative flex flex-col items-center py-10">
       {/* Top Header */}
       <div className="w-[1100px] flex justify-between items-center mb-6 px-4">
-        <div className="bg-purple-800 text-white rounded-full px-10 py-4 font-bold text-2xl shadow-md" style={{fontFamily:'Alfa Slab One, serif'}}>
+        <div
+          className="bg-purple-800 text-white rounded-full px-10 py-4 font-bold text-2xl shadow-md"
+          style={{ fontFamily: "Alfa Slab One, serif" }}
+        >
           LỚP {location.state?.class || 7} - {lessonObj.name.toUpperCase()}
         </div>
         <div className="flex items-center gap-4">
-          <div className="bg-yellow-300 rounded-full px-14 py-4 font-bold text-2xl shadow-md flex items-center" style={{fontFamily:'Alfa Slab One, serif'}}>
+          <div
+            className="bg-yellow-300 rounded-full px-14 py-4 font-bold text-2xl shadow-md flex items-center"
+            style={{ fontFamily: "Alfa Slab One, serif" }}
+          >
             <span className="mr-2">SỐ ĐIỂM:</span> <span>{state.tokens}</span>
           </div>
-          <button onClick={() => navigate('/')} className="text-4xl hover:scale-110 transition-transform" title="Cài đặt">
+          <button
+            onClick={() => navigate("/")}
+            className="text-4xl hover:scale-110 transition-transform"
+            title="Cài đặt"
+          >
             ⚙️
           </button>
         </div>
       </div>
 
       {/* Board Container */}
-      <div className="relative" style={{width: BOARD_WIDTH, height: BOARD_HEIGHT}}>
+      <div
+        className="relative"
+        style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
+      >
         <div style={boardStyle} className="rounded-xl overflow-hidden shadow-2xl">
+          {/* Squares + player */}
           <div style={wrapperStyle}>
             {squares.map((sq) => (
               <div
@@ -396,9 +458,12 @@ const ChemistryGame = () => {
           <div style={diceRollStyle}>
             <DiceRoller
               onRoll={handleDiceRoll}
-              disabled={state.gamePhase !== GAME_PHASES.ROLL_DICE || animatingMove}
+              disabled={
+                state.gamePhase !== GAME_PHASES.ROLL_DICE || animatingMove
+              }
             />
           </div>
+
           {/* Center Title Overlay */}
           <div style={titleStyle}>
             <GameSquare
@@ -408,18 +473,31 @@ const ChemistryGame = () => {
               alterWidth={400}
             />
           </div>
-        </div>
-        {/* Decorative arrows bottom */}
-        <div className="absolute -bottom-20 left-0 flex items-center gap-8 w-full justify-between px-4">
-          <div className="flex flex-col items-start gap-4">
-            <div className="text-red-600 text-5xl font-bold tracking-wider">&lt;&lt;&lt;&lt;&lt;</div>
-            <button onClick={handleRestart} className="bg-red-600 text-white font-bold px-10 py-4 rounded-full text-xl shadow hover:scale-105 transition-transform" style={{fontFamily:'Alfa Slab One, serif'}}>
+
+          {/* Bottom-left controls INSIDE board */}
+          <div className="absolute bottom-4 left-4 flex flex-col items-start gap-3">
+            <div className="text-red-600 text-4xl font-bold tracking-wider">
+              &lt;&lt;&lt;&lt;&lt;
+            </div>
+            <button
+              onClick={handleRestart}
+              className="bg-red-600 text-white font-bold px-8 py-3 rounded-full text-lg shadow hover:scale-105 transition-transform"
+              style={{ fontFamily: "Alfa Slab One, serif" }}
+            >
               THOÁT KHỎI GAME
             </button>
           </div>
-          <div className="flex flex-col items-end gap-4">
-            <div className="text-gray-400 text-5xl font-bold tracking-wider">&gt;&gt;&gt;&gt;&gt;</div>
-            <button disabled className="bg-gray-400 text-white font-bold px-12 py-4 rounded-full text-xl shadow cursor-not-allowed" style={{fontFamily:'Alfa Slab One, serif'}}>
+
+          {/* Bottom-right controls INSIDE board */}
+          <div className="absolute bottom-4 right-4 flex flex-col items-end gap-3">
+            <div className="text-gray-400 text-4xl font-bold tracking-wider">
+              &gt;&gt;&gt;&gt;&gt;
+            </div>
+            <button
+              disabled
+              className="bg-gray-400 text-white font-bold px-8 py-3 rounded-full text-lg shadow cursor-not-allowed"
+              style={{ fontFamily: "Alfa Slab One, serif" }}
+            >
               BÀI TIẾP THEO
             </button>
           </div>
