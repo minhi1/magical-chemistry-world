@@ -53,9 +53,9 @@ const DiceRoller = ({ onRoll, disabled }) => {
         )}
       </button>
       
-      <p className="mt-2 text-white font-bold text-lg">
+      {/* <p className="mt-2 text-white font-bold text-lg">
         {isRolling ? '🎲 Đang tung...' : disabled ? '⏸️ Chờ đợi...' : '🎲 Tung xúc xắc'}
-      </p>
+      </p> */}
     </div>
   );
 };
