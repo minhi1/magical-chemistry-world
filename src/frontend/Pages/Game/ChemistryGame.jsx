@@ -353,24 +353,24 @@ const ChemistryGame = () => {
         style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
       >
         <div style={boardStyle} className="rounded-xl overflow-hidden shadow-2xl">
-          {/* ===== Góc trên trái: LỚP / BÀI ===== */}
+          {/* ===== Top Left Corner: CLASS / LESSON ===== */}
           <div
             className="absolute top-4 left-4 px-8 py-3 rounded-full text-white text-xl font-bold shadow-md"
             style={{
               backgroundColor: "#5b21b6", // tương đương bg-purple-800
-              fontFamily: "Alfa Slab One, serif",
+              fontFamily: "Montserrat bold, sans-serif",
             }}
           >
             LỚP {location.state?.class || 7} - {lessonObj.name.toUpperCase()}
           </div>
 
-          {/* ===== Góc trên phải: ĐIỂM + nút cài đặt ===== */}
+          {/* ===== Top Right Corner: SCORE + Settings Button ===== */}
           <div className="absolute top-4 right-4 flex items-center gap-4">
             <div
               className="rounded-full px-10 py-3 text-xl font-bold shadow-md flex items-center"
               style={{
                 backgroundColor: "#fde047", // bg-yellow-300
-                fontFamily: "Alfa Slab One, serif",
+                fontFamily: "Montserrat bold, sans-serif",
               }}
             >
               <span className="mr-2">SỐ ĐIỂM:</span>
@@ -442,7 +442,7 @@ const ChemistryGame = () => {
             <button
               onClick={handleRestart}
               className="bg-red-600 text-white font-bold px-8 py-3 rounded-full text-lg shadow hover:scale-105 transition-transform"
-              style={{ fontFamily: "Alfa Slab One, serif" }}
+              style={{ fontFamily: "Montserrat bold, sans-serif" }}
             >
               THOÁT KHỎI GAME
             </button>
@@ -456,7 +456,7 @@ const ChemistryGame = () => {
             <button
               disabled
               className="bg-gray-400 text-white font-bold px-8 py-3 rounded-full text-lg shadow cursor-not-allowed"
-              style={{ fontFamily: "Alfa Slab One, serif" }}
+              style={{ fontFamily: "Montserrat bold, sans-serif" }}
             >
               BÀI TIẾP THEO
             </button>
