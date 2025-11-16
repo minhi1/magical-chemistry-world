@@ -357,7 +357,7 @@ const ChemistryGame = () => {
               className="text-3xl hover:scale-110 transition-transform"
               title="Cài đặt"
             >
-              ⚙️
+              <img src="../../assets/icon-settings-white.png" alt="Cài đặt" className="w-10 h-10" />
             </button>
           </div>
 
