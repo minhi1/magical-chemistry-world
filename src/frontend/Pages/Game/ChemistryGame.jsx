@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useGame } from "../../context/GameContext";
 import { GameSquare, SQUARE_SIZE } from "../../Components/GameSquare";
 import PlayerPanel from "../../Components/PlayerPanel";
@@ -6,7 +7,6 @@ import DiceRoller from "../../Components/DiceRoller";
 import QuestionModal from "../../Components/QuestionModal";
 import DarkArtsModal from "../../Components/DarkArtsModal";
 import WinModal from "../../Components/WinModal";
-import GameSetup from "../../Components/GameSetup";
 
 import boardBg from "../../assets/game-background.svg";
 import placeholderSquare from "../../assets/fence.png";
@@ -21,7 +21,7 @@ import wombatImg from "../../assets/wombat.png";
 import diceRollImg from "../../assets/dice-roll.png";
 import titleImg from "../../assets/title.png";
 
-import { COLS, ROWS, BOARD_WIDTH, BOARD_HEIGHT, GAME_PHASES, SQUARE_CONFIG, SQUARE_TYPES, DARK_ARTS_CARDS } from "../../data/gameConfig";
+import { COLS, ROWS, BOARD_WIDTH, BOARD_HEIGHT, GAME_PHASES, SQUARE_CONFIG, SQUARE_TYPES, DARK_ARTS_CARDS, LESSONS } from "../../data/gameConfig";
 import { getQuestionByLessonAndSquare } from "../../data/questions";
 
 // Store the source and positions for each type of image
@@ -37,8 +37,24 @@ const imgInfo = {
 };
 
 const ChemistryGame = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { state, dispatch } = useGame();
   const [animatingMove, setAnimatingMove] = useState(false);
+
+  // Get lesson and mode from navigation state
+  const lesson = location.state?.lesson || 2;
+  const mode = location.state?.mode || 'single';
+
+  // Auto-start game when component mounts
+  useEffect(() => {
+    if (state.gamePhase === GAME_PHASES.SETUP) {
+      dispatch({
+        type: 'START_GAME',
+        payload: { lesson, mode }
+      });
+    }
+  }, []);
 
   // Prepare images by position array for quick lookup
   const imgsByPosition = [];
@@ -134,14 +150,6 @@ const ChemistryGame = () => {
     top: rightRow * SQUARE_SIZE,
     role: "destination",
   });
-
-  // Handle game start
-  const handleGameStart = (playerName, lesson) => {
-    dispatch({
-      type: 'START_GAME',
-      payload: { playerName, lesson }
-    });
-  };
 
   // Handle dice roll
   const handleDiceRoll = (value) => {
@@ -273,6 +281,7 @@ const ChemistryGame = () => {
   // Handle game restart
   const handleRestart = () => {
     dispatch({ type: 'RESET_GAME' });
+    navigate('/');
   };
 
   // Board style
@@ -332,71 +341,87 @@ const ChemistryGame = () => {
     };
   };
 
-  // Show setup screen if game hasn't started
-  if (state.gamePhase === GAME_PHASES.SETUP) {
-    return <GameSetup onStart={handleGameStart} />;
-  }
+  // Get lesson display name
+  const lessonObj = LESSONS.find(l => l.id === state.selectedLesson) || { name: `Bài ${state.selectedLesson}` };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4 overflow-y-auto overflow-x-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Player Panel */}
-          <div className="lg:col-span-1">
-            <PlayerPanel />
+    <div className="min-h-screen bg-gray-900 relative flex flex-col items-center py-10">
+      {/* Top Header */}
+      <div className="w-[1100px] flex justify-between items-center mb-6 px-4">
+        <div className="bg-purple-800 text-white rounded-full px-10 py-4 font-bold text-2xl shadow-md" style={{fontFamily:'Alfa Slab One, serif'}}>
+          LỚP {location.state?.class || 7} - {lessonObj.name.toUpperCase()}
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="bg-yellow-300 rounded-full px-14 py-4 font-bold text-2xl shadow-md flex items-center" style={{fontFamily:'Alfa Slab One, serif'}}>
+            <span className="mr-2">SỐ ĐIỂM:</span> <span>{state.tokens}</span>
+          </div>
+          <button onClick={() => navigate('/')} className="text-4xl hover:scale-110 transition-transform" title="Cài đặt">
+            ⚙️
+          </button>
+        </div>
+      </div>
+
+      {/* Board Container */}
+      <div className="relative" style={{width: BOARD_WIDTH, height: BOARD_HEIGHT}}>
+        <div style={boardStyle} className="rounded-xl overflow-hidden shadow-2xl">
+          <div style={wrapperStyle}>
+            {squares.map((sq) => (
+              <div
+                key={sq.id}
+                style={{
+                  position: "absolute",
+                  left: sq.left,
+                  top: sq.top,
+                  width: SQUARE_SIZE,
+                  height: SQUARE_SIZE,
+                  pointerEvents: "auto",
+                }}
+              >
+                <GameSquare
+                  imageSource={imgsByPosition[getPositionById(sq.id)]}
+                  onClick={() => {}}
+                />
+              </div>
+            ))}
+
+            {/* Player Piece */}
+            {state.currentPosition > 0 && (
+              <div style={getPlayerPieceStyle()}>
+                <div className="text-5xl animate-bounce">🧙‍♂️</div>
+              </div>
+            )}
           </div>
 
-          {/* Game Board */}
-          <div className="lg:col-span-3 overflow-x-auto">
-            <div style={boardStyle}>
-              <div style={wrapperStyle}>
-                {squares.map((sq) => (
-                  <div
-                    key={sq.id}
-                    style={{
-                      position: "absolute",
-                      left: sq.left,
-                      top: sq.top,
-                      width: SQUARE_SIZE,
-                      height: SQUARE_SIZE,
-                      pointerEvents: "auto",
-                    }}
-                  >
-                    <GameSquare
-                      imageSource={imgsByPosition[getPositionById(sq.id)]}
-                      onClick={() => {}}
-                    />
-                  </div>
-                ))}
-
-                {/* Player Piece */}
-                {state.currentPosition > 0 && (
-                  <div style={getPlayerPieceStyle()}>
-                    <div className="text-4xl animate-bounce">
-                      🧙‍♂️
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Dice in center */}
-              <div style={diceRollStyle}>
-                <DiceRoller
-                  onRoll={handleDiceRoll}
-                  disabled={state.gamePhase !== GAME_PHASES.ROLL_DICE || animatingMove}
-                />
-              </div>
-
-              {/* Title */}
-              <div style={titleStyle}>
-                <GameSquare
-                  imageSource={titleImg}
-                  onClick={() => {}}
-                  alterHeight={120}
-                  alterWidth={400}
-                />
-              </div>
-            </div>
+          {/* Center Dice */}
+          <div style={diceRollStyle}>
+            <DiceRoller
+              onRoll={handleDiceRoll}
+              disabled={state.gamePhase !== GAME_PHASES.ROLL_DICE || animatingMove}
+            />
+          </div>
+          {/* Center Title Overlay */}
+          <div style={titleStyle}>
+            <GameSquare
+              imageSource={titleImg}
+              onClick={() => {}}
+              alterHeight={120}
+              alterWidth={400}
+            />
+          </div>
+        </div>
+        {/* Decorative arrows bottom */}
+        <div className="absolute -bottom-20 left-0 flex items-center gap-8 w-full justify-between px-4">
+          <div className="flex flex-col items-start gap-4">
+            <div className="text-red-600 text-5xl font-bold tracking-wider">&lt;&lt;&lt;&lt;&lt;</div>
+            <button onClick={handleRestart} className="bg-red-600 text-white font-bold px-10 py-4 rounded-full text-xl shadow hover:scale-105 transition-transform" style={{fontFamily:'Alfa Slab One, serif'}}>
+              THOÁT KHỎI GAME
+            </button>
+          </div>
+          <div className="flex flex-col items-end gap-4">
+            <div className="text-gray-400 text-5xl font-bold tracking-wider">&gt;&gt;&gt;&gt;&gt;</div>
+            <button disabled className="bg-gray-400 text-white font-bold px-12 py-4 rounded-full text-xl shadow cursor-not-allowed" style={{fontFamily:'Alfa Slab One, serif'}}>
+              BÀI TIẾP THEO
+            </button>
           </div>
         </div>
       </div>
@@ -418,7 +443,6 @@ const ChemistryGame = () => {
 
       {state.showWinModal && (
         <WinModal
-          playerName={state.playerName}
           tokens={state.tokens}
           moves={state.moveHistory.length}
           onRestart={handleRestart}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const WinModal = ({ playerName, tokens, moves, onRestart }) => {
+const WinModal = ({ tokens, moves, onRestart }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
       <div className="bg-gradient-to-br from-yellow-600 to-orange-600 rounded-2xl shadow-2xl max-w-md w-full border-4 border-yellow-300">
@@ -15,7 +15,7 @@ const WinModal = ({ playerName, tokens, moves, onRestart }) => {
         {/* Win Content */}
         <div className="p-8 text-center text-white">
           <p className="text-2xl font-bold mb-6">
-            Chúc mừng {playerName}!
+            Chúc mừng bạn!
           </p>
           
           <p className="text-lg mb-6">

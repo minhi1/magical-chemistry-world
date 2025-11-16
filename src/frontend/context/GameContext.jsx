@@ -14,7 +14,7 @@ const GameContext = createContext();
 const initialState = {
   // Game settings
   selectedLesson: 2, // Default to lesson 2
-  playerName: '',
+  gameMode: 'single', // 'single' or 'group'
   
   // Game state
   gamePhase: GAME_PHASES.SETUP,
@@ -47,8 +47,8 @@ const gameReducer = (state, action) => {
     case 'START_GAME':
       return {
         ...state,
-        playerName: action.payload.playerName,
         selectedLesson: action.payload.lesson,
+        gameMode: action.payload.mode || 'single',
         gamePhase: GAME_PHASES.ROLL_DICE,
         currentPosition: START_POSITION,
         tokens: 0,

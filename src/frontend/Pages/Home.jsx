@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import menuBackground from "../assets/menu-background.png";
 import classDropdownButton from "../assets/class-dropdown-button.png";
 import classButton from "../assets/class-button.png";
@@ -15,10 +15,23 @@ import iconUser from "../assets/icon-user.png";
 import magicalChemWorldTitle from "../assets/magical-chem-world-title.png";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [selectedClass, setSelectedClass] = useState(7);
+  const [selectedLesson, setSelectedLesson] = useState(2);
+  const [showLessons, setShowLessons] = useState(false);
 
   const handleClassSelect = (classNumber) => {
     setSelectedClass(classNumber);
+    setShowLessons(true);
+  };
+
+  const handleLessonSelect = (lessonNumber) => {
+    setSelectedLesson(lessonNumber);
+  };
+
+  const handleStartClick = () => {
+    // Navigate to game mode selection with selected lesson
+    navigate('/game-mode', { state: { lesson: selectedLesson, class: selectedClass } });
   };
 
   const handleIconClick = (iconType) => {
@@ -74,45 +87,101 @@ const Home = () => {
           />
         </div>
 
-        {/* Left Side - Class Selection */}
+        {/* Left Side - Class/Lesson Selection */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2">
-          {/* Class Dropdown Header */}
-          <div className="mb-4">
-            <img 
-              src={classDropdownButton} 
-              alt="Khối"
-            />
-          </div>
+          {!showLessons ? (
+            <>
+              {/* Class Dropdown Header */}
+              <div className="mb-4">
+                <img 
+                  src={classDropdownButton} 
+                  alt="Khối"
+                />
+              </div>
 
-          {/* Class Buttons */}
-          <div className="space-y-3">
-            {[7, 8, 9].map((classNum) => (
-              <button
-                key={classNum}
-                onClick={() => handleClassSelect(classNum)}
-                className="relative block hover:scale-105 transition-transform"
-              >
+              {/* Class Buttons */}
+              <div className="space-y-3">
+                {[7, 8, 9].map((classNum) => (
+                  <button
+                    key={classNum}
+                    onClick={() => handleClassSelect(classNum)}
+                    className="relative block hover:scale-105 transition-transform"
+                  >
+                    <img 
+                      src={buttonImg} 
+                      alt={`Lớp ${classNum}`}
+                    />
+                    {/* Class Number Text */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-black font-bold text-lg">
+                        Lớp {classNum}
+                      </span>
+                    </div>
+                    {/* Selection Circle */}
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                      <div 
+                        className={`w-6 h-6 rounded-full border-2 border-black ${
+                          selectedClass === classNum ? 'bg-red-500' : 'bg-yellow-400'
+                        }`}
+                      />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Class Header with back arrow */}
+              <div className="mb-4 relative">
                 <img 
                   src={buttonImg} 
-                  alt={`Lớp ${classNum}`}
+                  alt={`Lớp ${selectedClass}`}
                 />
-                {/* Class Number Text */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-black font-bold text-lg">
-                    Lớp {classNum}
+                    Lớp {selectedClass}
                   </span>
                 </div>
-                {/* Selection Circle */}
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                  <div 
-                    className={`w-6 h-6 rounded-full border-2 border-black ${
-                      selectedClass === classNum ? 'bg-red-500' : 'bg-yellow-400'
-                    }`}
-                  />
-                </div>
-              </button>
-            ))}
-          </div>
+                <button
+                  onClick={() => setShowLessons(false)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-black text-2xl font-bold hover:scale-110"
+                >
+                  &gt;
+                </button>
+              </div>
+
+              {/* Lesson Buttons */}
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {[2, 3, 4, 5, 6, 7].map((lessonNum) => (
+                  <button
+                    key={lessonNum}
+                    onClick={() => handleLessonSelect(lessonNum)}
+                    className="relative block hover:scale-105 transition-transform"
+                  >
+                    <img 
+                      src={buttonImg} 
+                      alt={`Bài ${lessonNum}`}
+                      className={selectedLesson === lessonNum ? 'opacity-100' : 'opacity-70'}
+                    />
+                    {/* Lesson Text */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-black font-bold text-lg">
+                        Bài {lessonNum}
+                      </span>
+                    </div>
+                    {/* Selection Circle */}
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                      <div 
+                        className={`w-6 h-6 rounded-full border-2 border-black ${
+                          selectedLesson === lessonNum ? 'bg-red-500' : 'bg-gray-700'
+                        }`}
+                      />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Center - Witch Character */}
@@ -126,12 +195,17 @@ const Home = () => {
 
         {/* Bottom Center - Start Button */}
         <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
-          <Link to="/game" className="block hover:scale-105 transition-transform">
+          <button 
+            onClick={handleStartClick}
+            className="block hover:scale-105 transition-transform"
+            disabled={!showLessons}
+            style={{ opacity: showLessons ? 1 : 0.5 }}
+          >
             <img 
               src={startButton} 
               alt="Start Game"
             />
-          </Link>
+          </button>
         </div>
 
         {/* Bottom Right - Single Fence with Both Buttons */}
@@ -146,7 +220,7 @@ const Home = () => {
             {/* Friends Button (Top Row) */}
             <button 
               onClick={handleFriendsClick}
-              className="absolute top-3 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform"
+              className="absolute top-8 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform"
             >
               <img 
                 src={friendsTextButton} 
@@ -157,7 +231,7 @@ const Home = () => {
             {/* Progress Button (Bottom Row) */}
             <button 
               onClick={handleProgressClick}
-              className="absolute bottom-3 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform"
+              className="absolute bottom-20 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform"
             >
               <img 
                 src={progressTextButton} 
