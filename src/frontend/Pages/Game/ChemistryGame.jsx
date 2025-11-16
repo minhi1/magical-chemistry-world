@@ -18,6 +18,7 @@ import owlImg from "../../assets/owl.png";
 import newtImg from "../../assets/newt.png";
 import wombatImg from "../../assets/wombat.png";
 import titleImg from "../../assets/title.png";
+import questionMarkImg from "../../assets/question-mark.png"; // 
 
 import {
   COLS,
@@ -50,11 +51,9 @@ const ChemistryGame = () => {
   const { state, dispatch } = useGame();
   const [animatingMove, setAnimatingMove] = useState(false);
 
-  // Get lesson and mode from navigation state
   const lesson = location.state?.lesson || 2;
   const mode = location.state?.mode || "single";
 
-  // Auto-start game when component mounts
   useEffect(() => {
     if (state.gamePhase === GAME_PHASES.SETUP) {
       dispatch({
@@ -65,7 +64,6 @@ const ChemistryGame = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Prepare images by position array for quick lookup
   const imgsByPosition = [];
   for (let i = 0; i < COLS * 2 + 3; ++i) {
     imgsByPosition.push(placeholderSquare);
@@ -78,7 +76,6 @@ const ChemistryGame = () => {
     });
   }
 
-  // Helper function to transform square id to corresponding position index
   const getPositionById = (id) => {
     const [side, index] = id.split("-");
     if (side === "top") {
@@ -96,28 +93,21 @@ const ChemistryGame = () => {
     return -1;
   };
 
-  // Get square ID from position number
   const getSquareIdFromPosition = (position) => {
-    // Bottom row (right to left): positions 1-8
     if (position >= 1 && position <= 8) {
       return `bottom-${8 - position}`;
     }
-    // Left column: positions 9-10
     if (position === 9) return "left-3";
     if (position === 10) return "left-2";
-    // Top row (left to right): positions 11-18
     if (position >= 11 && position <= 18) {
       return `top-${position - 11}`;
     }
-    // Right destination: position 19
     if (position === 19) return "right-2";
     return null;
   };
 
-  // Contains all the squares to render
   const squares = [];
 
-  // top row (row 1)
   for (let c = 0; c < COLS; c++) {
     squares.push({
       id: `top-${c}`,
@@ -127,9 +117,8 @@ const ChemistryGame = () => {
     });
   }
 
-  // bottom row (row 4)
   for (let c = 0; c < COLS; c++) {
-    const isStart = c === COLS - 1; // rightmost bottom square is the start
+    const isStart = c === COLS - 1;
     squares.push({
       id: `bottom-${c}`,
       left: c * SQUARE_SIZE,
@@ -138,7 +127,6 @@ const ChemistryGame = () => {
     });
   }
 
-  // left side: two squares in the left column at row 2 and row 3
   for (let r = 2; r <= 3; r++) {
     squares.push({
       id: `left-${r}`,
@@ -148,7 +136,6 @@ const ChemistryGame = () => {
     });
   }
 
-  // right side: single square in right column between top and bottom (row 2)
   const rightRow = 2;
   squares.push({
     id: `right-${rightRow}`,
@@ -157,7 +144,6 @@ const ChemistryGame = () => {
     role: "destination",
   });
 
-  // Handle dice roll
   const handleDiceRoll = (value) => {
     if (state.turnsToSkip > 0) {
       dispatch({
@@ -175,7 +161,6 @@ const ChemistryGame = () => {
     }, 500);
   };
 
-  // Move player
   const movePlayer = (steps, isFromForcedMove = false) => {
     setAnimatingMove(true);
     let newPosition = state.currentPosition + steps;
@@ -191,7 +176,6 @@ const ChemistryGame = () => {
     }, 800);
   };
 
-  // Handle square effects
   const handleSquareEffect = (position, isFromForcedMove = false) => {
     const squareConfig = SQUARE_CONFIG[position];
 
@@ -243,7 +227,6 @@ const ChemistryGame = () => {
     }
   };
 
-  // Handle question answer
   const handleAnswerQuestion = (isCorrect, difficulty) => {
     dispatch({
       type: "ANSWER_QUESTION",
@@ -260,7 +243,6 @@ const ChemistryGame = () => {
     }
   };
 
-  // Handle Dark Arts penalty
   const handleApplyDarkArts = () => {
     const darkArts = state.currentDarkArts;
     dispatch({ type: "APPLY_DARK_ARTS" });
@@ -277,13 +259,11 @@ const ChemistryGame = () => {
     }, 100);
   };
 
-  // Handle game restart
   const handleRestart = () => {
     dispatch({ type: "RESET_GAME" });
     navigate("/");
   };
 
-  // Board style
   const boardStyle = {
     position: "relative",
     width: BOARD_WIDTH,
@@ -295,7 +275,6 @@ const ChemistryGame = () => {
     boxSizing: "content-box",
   };
 
-  // Wrap for all play squares
   const wrapperStyle = {
     position: "absolute",
     top: 0,
@@ -305,21 +284,18 @@ const ChemistryGame = () => {
     pointerEvents: "none",
   };
 
-  // Dice roll style
   const diceRollStyle = {
     position: "absolute",
     left: (COLS / 2) * SQUARE_SIZE - SQUARE_SIZE / 2,
     top: SQUARE_SIZE * 3 - SQUARE_SIZE / 4,
   };
 
-  // Title style
   const titleStyle = {
     position: "absolute",
     left: (COLS / 4) * SQUARE_SIZE + SQUARE_SIZE / 2,
     top: SQUARE_SIZE * 2 - SQUARE_SIZE / 4,
   };
 
-  // Player piece style
   const getPlayerPieceStyle = () => {
     const squareId = getSquareIdFromPosition(state.currentPosition);
     if (!squareId) return { display: "none" };
@@ -339,7 +315,6 @@ const ChemistryGame = () => {
     };
   };
 
-  // Get lesson display name
   const lessonObj =
     LESSONS.find((l) => l.id === state.selectedLesson) || {
       name: `Bài ${state.selectedLesson}`,
@@ -347,30 +322,29 @@ const ChemistryGame = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center py-10">
-      {/* Board Container */}
       <div
         className="relative"
         style={{ width: BOARD_WIDTH, height: BOARD_HEIGHT }}
       >
         <div style={boardStyle} className="rounded-xl overflow-hidden shadow-2xl">
-          {/* ===== Top Left Corner: CLASS / LESSON ===== */}
+          {/* Top-left: class / lesson */}
           <div
             className="absolute top-4 left-4 px-8 py-3 rounded-full text-white text-xl font-bold shadow-md"
             style={{
-              backgroundColor: "#5b21b6", // tương đương bg-purple-800
-              fontFamily: "Montserrat bold, sans-serif",
+              backgroundColor: "#5b21b6",
+              fontFamily: "Alfa Slab One, serif",
             }}
           >
             LỚP {location.state?.class || 7} - {lessonObj.name.toUpperCase()}
           </div>
 
-          {/* ===== Top Right Corner: SCORE + Settings Button ===== */}
+          {/* Top-right: score + settings */}
           <div className="absolute top-4 right-4 flex items-center gap-4">
             <div
               className="rounded-full px-10 py-3 text-xl font-bold shadow-md flex items-center"
               style={{
-                backgroundColor: "#fde047", // bg-yellow-300
-                fontFamily: "Montserrat bold, sans-serif",
+                backgroundColor: "#fde047",
+                fontFamily: "Alfa Slab One, serif",
               }}
             >
               <span className="mr-2">SỐ ĐIỂM:</span>
@@ -406,7 +380,6 @@ const ChemistryGame = () => {
               </div>
             ))}
 
-            {/* Player Piece */}
             {state.currentPosition > 0 && (
               <div style={getPlayerPieceStyle()}>
                 <div className="text-5xl animate-bounce">🧙‍♂️</div>
@@ -414,7 +387,7 @@ const ChemistryGame = () => {
             )}
           </div>
 
-          {/* Center Dice */}
+          {/* Center dice */}
           <div style={diceRollStyle}>
             <DiceRoller
               onRoll={handleDiceRoll}
@@ -424,7 +397,7 @@ const ChemistryGame = () => {
             />
           </div>
 
-          {/* Center Title Overlay */}
+          {/* Center title */}
           <div style={titleStyle}>
             <GameSquare
               imageSource={titleImg}
@@ -434,37 +407,52 @@ const ChemistryGame = () => {
             />
           </div>
 
-          {/* Bottom-left controls INSIDE board */}
-          <div className="absolute bottom-4 left-4 flex flex-col items-start gap-3">
+          {/* Bottom-left button */}
+          <div className="absolute bottom-4 left-4 flex flex-col items-start gap-2">
             <div className="text-red-600 text-4xl font-bold tracking-wider">
               &lt;&lt;&lt;&lt;&lt;
             </div>
             <button
               onClick={handleRestart}
               className="bg-red-600 text-white font-bold px-8 py-3 rounded-full text-lg shadow hover:scale-105 transition-transform"
-              style={{ fontFamily: "Montserrat bold, sans-serif" }}
+              style={{ fontFamily: "Alfa Slab One, serif" }}
             >
               THOÁT KHỎI GAME
             </button>
           </div>
 
-          {/* Bottom-right controls INSIDE board */}
-          <div className="absolute bottom-4 right-4 flex flex-col items-end gap-3">
+          {/* Bottom-right button */}
+          <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
             <div className="text-gray-400 text-4xl font-bold tracking-wider">
               &gt;&gt;&gt;&gt;&gt;
             </div>
             <button
               disabled
               className="bg-gray-400 text-white font-bold px-8 py-3 rounded-full text-lg shadow cursor-not-allowed"
-              style={{ fontFamily: "Montserrat bold, sans-serif" }}
+              style={{ fontFamily: "Alfa Slab One, serif" }}
             >
               BÀI TIẾP THEO
+            </button>
+          </div>
+
+          {/* Bottom-center question mark  <<< */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+            <button
+              onClick={() => {
+                // TODO: implement instructions modal here
+              }}
+              className="hover:scale-105 transition-transform"
+            >
+              <img
+                src={questionMarkImg}
+                alt="Hướng dẫn"
+                className="w-12 h-12 object-contain"
+              />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modals */}
       {state.showQuestionModal && state.currentQuestion && (
         <QuestionModal
           question={state.currentQuestion}
