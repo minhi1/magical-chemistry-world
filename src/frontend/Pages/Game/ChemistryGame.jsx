@@ -6,6 +6,7 @@ import DiceRoller from "../../Components/DiceRoller";
 import QuestionModal from "../../Components/QuestionModal";
 import DarkArtsModal from "../../Components/DarkArtsModal";
 import WinModal from "../../Components/WinModal";
+import InstructionModal from "../../Components/InstructionModal";
 
 import boardBg from "../../assets/game-background.svg";
 import placeholderSquare from "../../assets/fence.png";
@@ -50,6 +51,7 @@ const ChemistryGame = () => {
   const location = useLocation();
   const { state, dispatch } = useGame();
   const [animatingMove, setAnimatingMove] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const lesson = location.state?.lesson || 2;
   const mode = location.state?.mode || "single";
@@ -438,9 +440,7 @@ const ChemistryGame = () => {
           {/* Bottom-center question mark  <<< */}
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
             <button
-              onClick={() => {
-                // TODO: implement instructions modal here
-              }}
+              onClick={() => setShowInstructions(true)}
               className="hover:scale-105 transition-transform"
             >
               <img
@@ -473,6 +473,10 @@ const ChemistryGame = () => {
           moves={state.moveHistory.length}
           onRestart={handleRestart}
         />
+      )}
+
+      {showInstructions && (
+        <InstructionModal onClose={() => setShowInstructions(false)} />
       )}
     </div>
   );
