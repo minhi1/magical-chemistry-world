@@ -147,14 +147,14 @@ const GameModeSelection = ({ onSelectMode, onBack }) => {
         </div> */}
 
         {/* Back Button - Bottom Left */}
-        <button
+        {/* <button
           onClick={onBack}
           className="absolute bottom-8 left-8 bg-gray-700 hover:bg-gray-600 text-white 
                      font-bold py-3 px-6 rounded-lg border-2 border-gray-500
                      transition-all duration-200 transform hover:scale-105 z-10"
         >
           ← Quay lại
-        </button>
+        </button> */}
       </div>
     </div>
   );
