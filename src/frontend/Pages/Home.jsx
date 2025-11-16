@@ -204,6 +204,7 @@ const Home = () => {
             <img 
               src={startButton} 
               alt="Start Game"
+              className="transform scale-75"
             />
           </button>
         </div>
